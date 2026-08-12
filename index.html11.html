@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overlay — The layer that makes the internet smarter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07070a;
+      --bg-soft: #0e0e13;
+      --text: #f4f3ef;
+      --text-dim: #8b8794;
+      --accent: #7c6cff;
+      --accent-soft: rgba(124, 108, 255, 0.15);
+      --border: rgba(255,255,255,0.07);
+      --card: rgba(255,255,255,0.03);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Background effects */
+    .bg-glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(140px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+    .glow-1 {
+      width: 600px;
+      height: 600px;
+      background: #7c6cff;
+      top: -200px;
+      left: -150px;
+      opacity: 0.18;
+    }
+    .glow-2 {
+      width: 500px;
+      height: 500px;
+      background: #4f46a5;
+      bottom: 10%;
+      right: -100px;
+      opacity: 0.15;
+    }
+
+    /* Nav */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.4rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(7,7,10,0.7);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .logo span {
+      color: var(--accent);
+    }
+    .nav-cta {
+      background: var(--accent);
+      color: white;
+      padding: 0.6rem 1.3rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .nav-cta:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 8rem 2rem 6rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent-soft);
+      color: #b4a9ff;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 0.4rem 1rem;
+      border-radius: 100px;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(124,108,255,0.25);
+    }
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.8rem, 7vw, 5.2rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      max-width: 900px;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, #a78bfa, #7c6cff, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 1.2rem;
+      color: var(--text-dim);
+      max-width: 560px;
+      margin-bottom: 2.8rem;
+      font-weight: 400;
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      padding: 0.95rem 2rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(124,108,255,0.35);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      padding: 0.95rem 2rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.03);
+    }
+
+    /* Visual demo mock */
+    .demo-window {
+      margin-top: 5rem;
+      width: 100%;
+      max-width: 920px;
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+      position: relative;
+    }
+    .demo-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 1.2rem;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid var(--border);
+    }
+    .demo-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #3a3a42;
+    }
+    .demo-dot:nth-child(1) { background: #ff5f57; }
+    .demo-dot:nth-child(2) { background: #ffbd2e; }
+    .demo-dot:nth-child(3) { background: #28c840; }
+    .demo-url {
+      margin-left: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      background: rgba(255,255,255,0.04);
+      padding: 0.3rem 0.9rem;
+      border-radius: 6px;
+    }
+    .demo-body {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      min-height: 380px;
+    }
+    .demo-page {
+      padding: 2rem;
+      background: #0a0a0f;
+      position: relative;
+    }
+    .fake-title {
+      height: 18px;
+      width: 60%;
+      background: rgba(255,255,255,0.08);
+      border-radius: 4px;
+      margin-bottom: 1.2rem;
+    }
+    .fake-line {
+      height: 10px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 3px;
+      margin-bottom: 0.7rem;
+    }
+    .fake-line.short { width: 70%; }
+    .fake-img {
+      height: 140px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+      margin: 1.5rem 0;
+    }
+    .overlay-panel {
+      background: linear-gradient(180deg, rgba(20,18,35,0.95), rgba(12,11,22,0.98));
+      border-left: 1px solid rgba(124,108,255,0.25);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .overlay-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .overlay-card {
+      background: rgba(124,108,255,0.08);
+      border: 1px solid rgba(124,108,255,0.15);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .overlay-card h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+    .overlay-card p {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    /* Sections */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 6rem 2rem;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      letter-spacing: -0.02em;
+      margin-bottom: 1.2rem;
+      max-width: 600px;
+    }
+    .section-desc {
+      color: var(--text-dim);
+      font-size: 1.1rem;
+      max-width: 520px;
+      margin-bottom: 3.5rem;
+    }
+
+    /* How it works */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .step {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 1.6rem;
+      transition: border-color 0.3s;
+    }
+    .step:hover {
+      border-color: rgba(124,108,255,0.3);
+    }
+    .step-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      opacity: 0.5;
+      margin-bottom: 1.2rem;
+    }
+    .step h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
+    .step p {
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* Use cases */
+    .cases {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+    }
+    .case {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.8rem;
+      display: flex;
+      gap: 1.2rem;
+      transition: all 0.3s;
+    }
+    .case:hover {
+      border-color: rgba(124,108,255,0.25);
+      transform: translateY(-3px);
+    }
+    .case-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--accent-soft);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .case h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+    .case p {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.55;
+    }
+
+    /* Vision */
+    .vision {
+      text-align: center;
+      padding: 7rem 2rem;
+    }
+    .vision h2 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      letter-spacing: -0.02em;
+      max-width: 700px;
+      margin: 0 auto 1.5rem;
+      line-height: 1.2;
+    }
+    .vision p {
+      color: var(--text-dim);
+      font-size: 1.15rem;
+      max-width: 500px;
+      margin: 0 auto 2.5rem;
+    }
+
+    /* Footer */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 800px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .demo-body { grid-template-columns: 1fr; }
+      .overlay-panel { border-left: none; border-top: 1px solid rgba(124,108,255,0.25); }
+      .steps { grid-template-columns: 1fr; }
+      .cases { grid-template-columns: 1fr; }
+      .hero { padding: 7rem 1.5rem 4rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-glow glow-1"></div>
+  <div class="bg-glow glow-2"></div>
+
+  <nav>
+    <a href="#" class="logo">Over<span>lay</span></a>
+    <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="badge">
+      <div class="badge-dot"></div>
+      Coming soon
+    </div>
+    <h1>A new layer<br>on top of the <span class="gradient">internet</span></h1>
+    <p class="hero-sub">
+      Overlay sits on any website you already use and makes it smarter, more useful, and interactive — without replacing it.
+    </p>
+    <div class="hero-buttons">
+      <a href="#waitlist" class="btn-primary">Join the Waitlist</a>
+      <a href="#how" class="btn-secondary">See how it works</a>
+    </div>
+
+    <!-- Demo mockup -->
+    <div class="demo-window">
+      <div class="demo-bar">
+        <div class="demo-dot"></div>
+        <div class="demo-dot"></div>
+        <div class="demo-dot"></div>
+        <div class="demo-url">youtube.com / football.com / any site</div>
+      </div>
+      <div class="demo-body">
+        <div class="demo-page">
+          <div class="fake-title"></div>
+          <div class="fake-line"></div>
+          <div class="fake-line"></div>
+          <div class="fake-line short"></div>
+          <div class="fake-img"></div>
+          <div class="fake-line"></div>
+          <div class="fake-line short"></div>
+          <div class="fake-line"></div>
+        </div>
+        <div class="overlay-panel">
+          <div class="overlay-label">Overlay Active</div>
+          <div class="overlay-card">
+            <h4>Player Stats</h4>
+            <p>Live form, recent performances, and key metrics pulled from the page.</p>
+          </div>
+          <div class="overlay-card">
+            <h4>Quick Context</h4>
+            <p>What this means, why it matters, and related insights.</p>
+          </div>
+          <div class="overlay-card">
+            <h4>Actions</h4>
+            <p>Compare, save, or dig deeper in one click.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how">
+    <div class="container">
+      <p class="section-label">How it works</p>
+      <h2 class="section-title">One tool. Any website.</h2>
+      <p class="section-desc">
+        Overlay understands the page you’re on and adds a smart interactive layer on top of it.
+      </p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <h3>You open any website</h3>
+          <p>YouTube, shopping sites, football pages, news, school platforms — whatever you already use.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <h3>Overlay reads the page</h3>
+          <p>It understands the content and context in real time so it knows what tools will actually help.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <h3>Extra power appears</h3>
+          <p>Stats, comparisons, explanations, actions — right on top of the page, without leaving it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Use cases -->
+  <section>
+    <div class="container">
+      <p class="section-label">Use cases</p>
+      <h2 class="section-title">Works where you already are</h2>
+      <p class="section-desc">
+        The same tool adapts to completely different types of websites.
+      </p>
+
+      <div class="cases">
+        <div class="case">
+          <div class="case-icon">⚽</div>
+          <div>
+            <h3>Football & Sports</h3>
+            <p>Player stats, form guides, match context, and explanations while you browse live pages.</p>
+          </div>
+        </div>
+        <div class="case">
+          <div class="case-icon">🛒</div>
+          <div>
+            <h3>Shopping</h3>
+            <p>Compare prices, see alternatives, and get clearer product breakdowns without opening ten tabs.</p>
+          </div>
+        </div>
+        <div class="case">
+          <div class="case-icon">▶️</div>
+          <div>
+            <h3>YouTube</h3>
+            <p>Extra context, summaries, key moments, and related insights while the video plays.</p>
+          </div>
+        </div>
+        <div class="case">
+          <div class="case-icon">📰</div>
+          <div>
+            <h3>News & Learning</h3>
+            <p>Quick explanations, background context, and smarter ways to understand what you’re reading.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Vision -->
+  <section class="vision" id="waitlist">
+    <p class="section-label">The vision</p>
+    <h2>One layer that makes almost any website smarter</h2>
+    <p>
+      Instead of building a new internet, we add intelligence on top of the one that already exists.
+    </p>
+    <a href="#" class="btn-primary">Join the Waitlist</a>
+  </section>
+
+  <footer>
+    Overlay — A new layer on the internet
+  </footer>
+</body>
+</html>
